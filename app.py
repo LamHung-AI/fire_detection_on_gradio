@@ -1,20 +1,18 @@
 import gradio as gr
-
-
-# sys.path.append(os.getcwd())
-def authentication(a, p):
-    return True
-
-
-from fire_detection_on_gradio.web_fire_database import models
-from fire_detection_on_gradio.web_fire_database import engine
+from web_fire_database.utils import *
+from web_fire_database import models
+from web_fire_database.database import engine
 models.Base.metadata.create_all(bind=engine)
 
 
 def flip(im):
     return im
 
+def get_user_id():
+    return id
+
 with gr.Blocks() as demo:
+    user_id = gr.State(id)
     gr.Markdown("""
     # Camera phát hiện đám cháy
     """)
@@ -25,7 +23,9 @@ with gr.Blocks() as demo:
         inp.stream(fn=flip, inputs=inp, outputs=out)
     with gr.Tab('📂Lưu trữ'):
         li  = gr.Textbox()
-    with gr.Tab('⚙️Cài đặt'):
-        k = gr.Textbox()
+    with gr.Tab('⚙️Tùy chỉnh'):
+        gr.Markdown("# Xem tất cả thông tin")
+        gr.Button().click(fn="")
 
-demo.launch(auth = authentication, auth_message= "Enter your username and password that you received in on Slack")
+
+demo.launch(auth = authentication, auth_message= "Đăng nhập")
