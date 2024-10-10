@@ -73,7 +73,7 @@ def list_info(id_user):
 def change_password(id_user, new_password1, new_password2):
     try:
         if new_password1 != new_password2:
-            print("Mật khẩu mới và xác nhận mật khẩu phải giống nhau")
+            gr.Info("Mật khẩu mới và xác nhận mật khẩu phải giống nhau ❗", duration=3)
         else:
             user = db.query(models.Users).filter(models.Users.IDUser==id_user)
             if user.first() is None:
@@ -81,6 +81,6 @@ def change_password(id_user, new_password1, new_password2):
                 return
             user.update({"MatKhau": new_password1}, synchronize_session=False)
             db.commit()
-            print("Cập nhật mật khẩu mới thành công!🎉️🎉")
+            gr.Info("Cập nhật mật khẩu mới thành công!🎉️🎉", duration=3)
     except:
         raise gr.Error(f"Đã có lỗi xảy ra. Quý khách vui lòng thử lại sau 💥!", duration=3)

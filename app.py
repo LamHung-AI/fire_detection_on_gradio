@@ -10,7 +10,7 @@ models.Base.metadata.create_all(bind=engine)
 
 
 fire_detection = YOLO('./fire_detection_model/fire_detection.pt')
-id_now = str(2)
+id_now = str(6)
 def flip(img):
     results = fire_detection.predict(source=img, conf=0.6)
 
@@ -32,7 +32,7 @@ def post_list_info(id_user):
     # Đổi thứ tự cột để "Họ tên người nhận" ở vị trí đầu tiên
     df = df[['Họ tên người nhận', 'SĐT']]
     return address, df
-with gr.Blocks() as demo:
+with gr.Blocks(theme='soft') as demo:
     gr.Markdown("""
     # Camera phát hiện đám cháy
     """)
@@ -56,5 +56,17 @@ with gr.Blocks() as demo:
             sdt = gr.Textbox(label="Số điện thoại người nhận", show_label=True, placeholder="Nhâp số điện thoại",scale=1)
         gr.Button("Thêm người nhận thông báo").click(fn=add_info,
                                                      inputs=[gr.Textbox(value = id_now, visible=False), ho_ten_nguoi_nhan, sdt])
-
+        gr.Markdown("# Xóa thông tin người nhận báo cháy")
+        delete_sdt = gr.Textbox(label="Số điện thoại người nhận cần xóa", show_label=True, placeholder="Nhâp số điện thoại người")
+        gr.Button('Xóa người nhận thông báo này').click(fn=delete_info,
+                                                        inputs=[gr.Textbox(value=id_now, visible=False), delete_sdt]
+                                                        )
+        gr.Markdown("# Đổi mật khẩu")
+        password1 = gr.Textbox(label="Mật khẩu mới", show_label=True,
+                             placeholder="Nhâp mật khẩu mới", type="password")
+        password2 = gr.Textbox(label="Nhập lại mật khẩu mới", show_label=True,
+                               placeholder="Nhâp lại mật khẩu mới", type="password")
+        gr.Button('Đổi mật khẩu').click(fn=change_password,
+                                        inputs=[gr.Textbox(value=id_now, visible=False), password1, password2]
+                                        )
 demo.launch(auth = authentication, auth_message= "Đăng nhập")
