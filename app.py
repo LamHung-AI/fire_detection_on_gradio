@@ -1,15 +1,26 @@
 import gradio as gr
 import pandas as pd
-from PIL.ImageOps import scale
+from ultralytics import YOLO
+from PIL import Image
 
 from web_fire_database.utils import *
 from web_fire_database import models
 from web_fire_database.database import engine
 models.Base.metadata.create_all(bind=engine)
 
+
+fire_detection = YOLO('./fire_detection_model/fire_detection.pt')
 id_now = str(2)
-def flip(im):
-    return im
+def flip(img):
+    results = fire_detection.predict(source=img, conf=0.6)
+
+    annotated_img = results[0].plot()
+    # Chuyển đổi từ BGR sang RGB bằng NumPy
+    annotated_img_rgb = annotated_img[..., ::-1]
+
+    # Chuyển đổi sang đối tượng PIL.Image
+    img_pil = Image.fromarray(annotated_img_rgb)
+    return img_pil
 
 def post_list_info(id_user):
     address, data = list_info(id_user)
@@ -27,7 +38,7 @@ with gr.Blocks() as demo:
     """)
     with gr.Tab("📸Camera"):
         with gr.Row():
-            inp = gr.Image(sources=["webcam"], label="Input Image", show_label=True, type="numpy", width = 384, height=216, scale=1)
+            inp = gr.Image(sources=["webcam"], label="Input Image", show_label=True, type="pil", width = 384, height=216, scale=1)
             out = gr.Image(label="Flipped Image", show_label=True, scale=2)
         inp.stream(fn=flip, inputs=inp, outputs=out)
     with gr.Tab('📂Lưu trữ'):

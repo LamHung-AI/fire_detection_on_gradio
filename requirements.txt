@@ -1,5 +1,6 @@
 gradio==4.44.1
 sqlalchemy==2.0.35
 psycopg2==2.9.9
+Pillow
 ultralytics
 python-dotenv
