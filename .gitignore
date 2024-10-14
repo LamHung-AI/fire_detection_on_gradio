@@ -1,2 +1,4 @@
 ../.idea/vcs.xml
 web_fire_database/__pycache__/*
+*/__pycache__/*
+__pycache__/*

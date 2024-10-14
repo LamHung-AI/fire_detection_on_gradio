@@ -1,23 +1,46 @@
-from fire_detection_on_gradio.web_fire_database.database import SessionLocal
-from fire_detection_on_gradio.web_fire_database import models
+from ultralytics import YOLO
+import pandas as pd
 import gradio as gr
 
+
+from fire_detection_on_gradio.web_fire_database.database import SessionLocal
+from fire_detection_on_gradio.web_fire_database import models
+
 db = SessionLocal()
+fire_detection = YOLO('./fire_detection_model/fire_detection.pt')
+def detection(img):
+    results = fire_detection.predict(source=img, conf=0.6)
+    annotated_img = results[0].plot()
+    annotated_img_rgb = annotated_img[..., ::-1]
+
+    return annotated_img_rgb
+
+def post_list_info(id_user):
+    address, data = list_info(id_user)
+    df = pd.DataFrame(data)
+
+    # Đổi tên cột
+    df = df.rename(columns={'HoTenNguoiNhan': 'Họ tên người nhận', 'SDT': 'SĐT'})
+
+    # Đổi thứ tự cột để "Họ tên người nhận" ở vị trí đầu tiên
+    df = df[['Họ tên người nhận', 'SĐT']]
+    return address, df
 
 def authentication(account, password):
     try:
 
         user = db.query(models.Users).filter(models.Users.TaiKhoan == account, models.Users.MatKhau == password).first()
         if user is not None:
-            return True
+            user = user.__dict__
+            return True, user["IDUser"]
         else:
-            return False
+            return False, None
     except:
         raise gr.Error(f"Đã có lỗi xảy ra. Quý khách vui lòng thử lại sau 💥!", duration=3)
 
 def add_info(id_user, hotennguoinhan, sdt):
-    if sdt.isnumeric() == False:
-        gr.Warning(f"Số điện thoại không hợp lệ📵. Xin vui lòng nhập lại số điện thoại khác❗", duration=3)
+    if not sdt.isdigit():
+        gr.Warning("Số điện thoại không hợp lệ📵. Xin vui lòng nhập lại số điện thoại khác❗", duration=3)
     else:
         people_info = {
             "IDUser" : id_user,
@@ -66,7 +89,7 @@ def list_info(id_user):
         user = user.__dict__
         all_people = db.query(models.Infomations).filter(models.Infomations.IDUser == id_user).all()
         all_people = list(map(clean_data,all_people))
-        return (user['DiaChiCamera'], all_people)
+        return user['DiaChiCamera'], all_people
     except Exception as e:
         print(f"error : {e}")
 
