@@ -136,7 +136,10 @@ with gr.Blocks(theme='soft') as demo:
         sdt = gr.Textbox(label="Số điện thoại", show_label=True)
         email = gr.Textbox(label="Email", show_label=True)
         diachi = gr.Textbox(label="Địa chủ", show_label=True)
-        gr.Button("Xem thông tin").click(fn=info_user, inputs=user_id, outputs=[ho_ten, ngay_sinh, sdt, email, diachi])
+
+        gr.Markdown("# Tất cả thông tin về camera")
+        all_camera = gr.DataFrame(label="Camera", show_label=True)
+        gr.Button("Xem thông tin").click(fn=info_user, inputs=user_id, outputs=[ho_ten, ngay_sinh, sdt, email, diachi, all_camera])
 
         gr.Markdown("# Đổi mật khẩu")
         old_password = gr.Textbox(label="Mật khẩu cũ", show_label=True,

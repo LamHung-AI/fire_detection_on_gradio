@@ -34,6 +34,43 @@ def info_user(user_id):
         Email = infor['Email']
         address = infor['DcChiTiet'] +" "+ infor['Phuong_Xa_Thon'] +" "+ infor['Quan_Huyen'] +" " + infor['Tinh_Tp']
 
+        return HoTenUser, NgaySinh, SDT, Email, address, post_get_infor_camera(user_id)
+    except Exception as e:
+        print(e)
+        db.close()
+def get_info_camera(user_id):
+    try:
+        info_camera = db.query(models.Camera).filter(models.Camera.IDUser == user_id).first()
+        info_camera = info_camera.__dict__
+        info_camera['dia_chi'] = info_camera['DcChiTiet'] + " " + info_camera['Phuong_Xa_Thon'] + " " + info_camera['Quan_Huyen'] + " " +info_camera['Tinh_Tp']
+        return info_camera
+    except Exception as e:
+        print(e)
+        db.close()
+
+def post_get_infor_camera(user_id):
+    data = get_info_camera(user_id)
+    # Lấy các trường IDCamera và diachi
+    filtered_data = {'IDCamera': data['IDCamera'], 'dia_chi': data['dia_chi']}
+
+    # Tạo DataFrame
+    df = pd.DataFrame([filtered_data])
+
+    # Đổi tên cột
+    df.rename(columns={'IDCamera': 'Id camera', 'dia_chi': 'Địa chỉ'}, inplace=True)
+
+    return df
+
+def info_user2(user_id):
+    try:
+        infor = db.query(models.Users).filter(models.Users.IDUser==user_id).first()
+        infor = infor.__dict__
+        HoTenUser = infor["HoTenUser"]
+        NgaySinh = infor['NgaySinh']
+        SDT = infor['SDT']
+        Email = infor['Email']
+        address = infor['DcChiTiet'] +" "+ infor['Phuong_Xa_Thon'] +" "+ infor['Quan_Huyen'] +" " + infor['Tinh_Tp']
+
         return HoTenUser, NgaySinh, SDT, Email, address
     except Exception as e:
         print(e)
