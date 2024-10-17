@@ -3,4 +3,4 @@ sqlalchemy==2.0.35
 psycopg2==2.9.9
 Pillow
 ultralytics
-python-dotenv
+# install ffmpeg
